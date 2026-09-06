@@ -1,0 +1,34 @@
+name: Extract ROOT AI archives
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract ROOT AI archives
+        run: |
+          set -e
+          mkdir -p recovered/v5.2.5 recovered/diagnostic-v1.1
+          unzip -o ROOT_7to10_AI_Operating_Environment_v5.2.5.zip -d recovered/v5.2.5
+          unzip -o ROOT_7to10_Diagnostic_Interface_v1.1.zip -d recovered/diagnostic-v1.1
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add recovered
+          if git diff --cached --quiet; then
+            echo "No extracted-file changes to commit."
+          else
+            git commit -m "Extract ROOT AI recovery archives"
+            git push
+          fi
