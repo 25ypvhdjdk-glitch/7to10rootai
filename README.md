@@ -35,3 +35,5 @@ Never commit secrets. `.env.example` contains names only.
 
 ## Recovery
 The v5.2.5 source was recovered from the preserved ROOT AI archive and restored to the repository root for deployment.
+
+Deployment verification trigger: source is now at repository root.
