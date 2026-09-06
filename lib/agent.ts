@@ -4,7 +4,7 @@ import { ROOT_SYSTEM } from './root';
 
 export const rootAgent = new ToolLoopAgent({
   model: 'openai/gpt-5.5',
-  instructions: ROOT_SYSTEM,
+  instructions: `${ROOT_SYSTEM}\n\nCONVERSATION RULE: Answer ordinary informational, creative, explanatory, and brainstorming questions directly. Do not require a connected tool merely to answer a question. Use mission planning only when the user asks for a plan/workflow or a real-world outcome. Use tools when they add necessary capability. Never invent tool results or claim external actions occurred.`,
   tools: {
     createMissionPlan: tool({
       description: 'Create a ROOT mission plan. This is planning only and never executes consequential actions.',
