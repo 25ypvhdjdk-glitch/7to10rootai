@@ -32,3 +32,6 @@ Never commit secrets. `.env.example` contains names only.
 - Mission plans now include a unique mission ID so the approval control is functional.
 - Mission planning is explicitly marked planning-only and requires approval before execution.
 - Risk classification still determines when heightened human authority is mandatory.
+
+## Recovery
+The v5.2.5 source was recovered from the preserved ROOT AI archive and restored to the repository root for deployment.
