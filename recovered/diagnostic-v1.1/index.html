@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROOT 7¹⁰ Diagnostic Engine</title>
+<style>
+:root{--bg:#09090b;--panel:#111116;--line:#292932;--text:#f5f5f5;--muted:#a1a1aa;--accent:#fff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#08080a,#15151a);color:var(--text);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:28px 18px 60px}.hero{padding:22px 0 12px}.eyebrow{letter-spacing:.18em;font-size:11px;color:var(--muted)}h1{font-size:clamp(34px,7vw,62px);margin:6px 0;letter-spacing:-.04em}h2{margin:0 0 10px}.sub{color:var(--muted);max-width:720px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.panel{background:#111116;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:var(--muted)}input,select,textarea{width:100%;background:#0b0b0f;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit}textarea{min-height:75px}.bar{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:1px solid var(--line);background:#f5f5f5;color:#09090b;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer}button.alt{background:#17171c;color:#fff}.dimension{margin-top:18px}.dimension h3{display:flex;justify-content:space-between;margin:0 0 8px}.cells{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.cell{border:1px solid var(--line);border-radius:10px;padding:8px;background:#0c0c10}.cell small{display:block;color:var(--muted);font-size:10px}.cell select{padding:7px;font-size:12px;margin-top:5px}.results{display:none}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{border:1px solid var(--line);border-radius:12px;padding:14px}.metric b{font-size:25px}.status{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:11px}.gate{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.gate:last-child{border:0}.action{padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0}.footer{color:#71717a;font-size:11px;margin-top:20px}
+@media(max-width:700px){.grid,.cards{grid-template-columns:1fr}.cells{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:18px 12px 40px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<div class="eyebrow">ROOT SYSTEMS / DIAGNOSTIC ENGINE v1.1</div>
+<h1>7¹⁰</h1>
+<h2>Capability Diagnostic</h2>
+<p class="sub">Score what a system can actually demonstrate. Find the bottleneck. Apply the three gates. Build the next capability.</p>
+</header>
+
+<section class="panel">
+<h2>01 — Define the subject</h2>
+<div class="grid">
+<div class="field"><label>SUBJECT NAME</label><input id="name" placeholder="e.g. My online service"></div>
+<div class="field"><label>TYPE</label><select id="type"><option>Business</option><option>Workflow</option><option>AI Agent</option><option>Product</option><option>System</option><option>Team</option></select></div>
+<div class="field"><label>OBJECTIVE</label><textarea id="objective" placeholder="What outcome must this system produce?"></textarea></div>
+<div class="field"><label>TARGET STATE</label><textarea id="target" placeholder="What does success look like?"></textarea></div>
+</div>
+<div class="bar"><button onclick="run()">RUN DIAGNOSTIC</button><button class="alt" onclick="save()">SAVE JSON</button><button class="alt" onclick="loadFile()">LOAD JSON</button><input id="file" type="file" accept=".json" style="display:none" onchange="loadJSON(event)"></div>
+</section>
+
+<section class="panel">
+<h2>02 — Score the 70 cells</h2>
+<p class="sub">Use evidence. 0 = absent. 4 = verified. 6 = controlled. 7 = orchestrated.</p>
+<div id="matrix"></div>
+</section>
+
+<section class="panel results" id="results">
+<h2>03 — Diagnostic report</h2>
+<div class="cards">
+<div class="metric"><span class="sub">OVERALL</span><br><b id="overall">—</b>/7</div>
+<div class="metric"><span class="sub">EVIDENCE COVERAGE</span><br><b id="coverage">—</b>%</div>
+<div class="metric"><span class="sub">BOTTLENECKS</span><br><b id="bcount">—</b></div>
+</div>
+<div id="profile"></div>
+</section>
+
+<section class="panel results" id="gates">
+<h2>04 — Control gates</h2>
+<div class="gate"><span><b>INTENT</b><br><small class="sub">/MISSION — objective, scope, success criteria</small></span><span id="g1" class="status">UNASSESSED</span></div>
+<div class="gate"><span><b>REALITY</b><br><small class="sub">/VERIFY + /SIMULATE — evidence and failure testing</small></span><span id="g2" class="status">UNASSESSED</span></div>
+<div class="gate"><span><b>SCALE</b><br><small class="sub">/OPTIMIZE + /AUTOMATE — stable, measurable process</small></span><span id="g3" class="status">UNASSESSED</span></div>
+</section>
+
+<section class="panel results" id="plan">
+<h2>05 — Prioritized improvement plan</h2>
+<div id="actions"></div>
+</section>
+<div class="footer">ROOT 7¹⁰ is a conceptual capability architecture. Scores are diagnostic signals, not scientific measurements.</div>
+</div>
+<script>
+const dims=[
+["D1","DEFINE"],["D2","DISCOVER"],["D3","ARCHITECT"],["D4","CREATE"],["D5","EXECUTE"],["D6","VERIFY"],["D7","EVOLVE"]];
+const levels=["RECOGNIZE","DESCRIBE","ANALYZE","DESIGN","PRODUCE","TEST","VERIFY","OPTIMIZE","AUTOMATE","ORCHESTRATE"];
+const labels=["ABSENT","CLAIMED","OBSERVED","REPEATABLE","VERIFIED","OPTIMIZED","CONTROLLED","ORCHESTRATED"];
+const matrix=document.getElementById("matrix");
+dims.forEach(([d,n])=>{
+ let el=document.createElement("div");el.className="dimension";
+ el.innerHTML=`<h3><span>${d} — ${n}</span><span id="${d}avg">—</span></h3><div class="cells">`;
+ levels.forEach((l,i)=>el.innerHTML+=`<div class="cell"><small>L${i+1} · ${l}</small><select data-cell="${d}-L${i+1}">${labels.map((x,s)=>`<option value="${s}">${s} — ${x}</option>`).join("")}</select></div>`);
+ el.innerHTML+="</div>";matrix.appendChild(el);
+});
+function scores(){let o={};document.querySelectorAll("select[data-cell]").forEach(s=>o[s.dataset.cell]=+s.value);return o}
+function gate(id,pass){let e=document.getElementById(id);e.textContent=pass?"PASS":"NEEDS WORK";e.style.opacity=pass?1:.7}
+function run(){
+ const s=scores(), vals=Object.values(s), avg=vals.reduce((a,b)=>a+b,0)/70;
+ document.getElementById("overall").textContent=avg.toFixed(2);
+ document.getElementById("coverage").textContent="100";
+ const low=Object.entries(s).filter(([k,v])=>v<=3).sort((a,b)=>a[1]-b[1]);
+ document.getElementById("bcount").textContent=low.length;
+ dims.forEach(([d,n])=>{let v=Object.entries(s).filter(([k])=>k.startsWith(d+"-")).map(x=>x[1]);document.getElementById(d+"avg").textContent=(v.reduce((a,b)=>a+b,0)/10).toFixed(1)+"/7"});
+ document.getElementById("profile").innerHTML="<h3>Capability profile</h3>"+dims.map(([d,n])=>{let v=Object.entries(s).filter(([k])=>k.startsWith(d+"-")).map(x=>x[1]);let a=v.reduce((x,y)=>x+y,0)/10;return `<div class="gate"><span>${d} — ${n}</span><span class="status">${a.toFixed(1)}/7</span></div>`}).join("");
+ const intent=(s["D1-L4"]>=4&&s["D1-L7"]>=4), reality=(s["D6-L7"]>=4), scale=(s["D6-L8"]>=4&&s["D6-L9"]>=4);
+ gate("g1",intent);gate("g2",reality);gate("g3",scale);
+ let acts=[];
+ if(!intent) acts.push(["01","Run /MISSION","Strengthen objective, success criteria, constraints and decision boundaries."]);
+ if(!reality) acts.push(["02","Run /VERIFY + /SIMULATE","Verify important outputs and test adverse/failure scenarios."]);
+ if(!scale) acts.push(["03","Run /OPTIMIZE before /AUTOMATE","Standardize and measure the process before scaling it."]);
+ low.slice(0,7).forEach(([k,v],i)=>acts.push([String(i+4).padStart(2,"0"),`Raise ${k}`,`Current score ${v}/7 (${labels[v]}). Produce repeatable evidence for the next level.`]));
+ document.getElementById("actions").innerHTML=acts.map(a=>`<div class="action"><b>${a[0]} · ${a[1]}</b><br><span class="sub">${a[2]}</span></div>`).join("");
+ document.querySelectorAll(".results").forEach(x=>x.style.display="block");
+ document.getElementById("results").scrollIntoView({behavior:"smooth"});
+}
+function payload(){return {version:"1.1",subject:{name:name.value,type:type.value,objective:objective.value,target_state:target.value},scores:scores(),timestamp:new Date().toISOString()}}
+function save(){let b=new Blob([JSON.stringify(payload(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="ROOT_7to10_assessment.json";a.click()}
+function loadFile(){document.getElementById("file").click()}
+function loadJSON(e){let r=new FileReader();r.onload=()=>{let x=JSON.parse(r.result);name.value=x.subject?.name||"";type.value=x.subject?.type||"Business";objective.value=x.subject?.objective||"";target.value=x.subject?.target_state||"";Object.entries(x.scores||{}).forEach(([k,v])=>{let s=document.querySelector(`[data-cell="${k}"]`);if(s)s.value=v});run()};r.readAsText(e.target.files[0])}
+</script>
+</body></html>
